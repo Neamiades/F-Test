@@ -244,19 +244,27 @@ module PipelinesAndComposition =
     let max L = snd (minmax L)
 
     let rec rpt n f =
-        if n=0 then fun x -> x
+        if n = 0 then fun x -> x
         else f >> (rpt (n-1) f)
 
-    let rec getDigitAsList digit list =
-        match digit with
-            | 0 -> list
-            | _ -> getDigitAsList (digit / 10) list @ [digit % 10]
+    let getDigitAsList (digit : int64) =
+        let rec accum digit list =
+            match digit with
+                | 0L -> list
+                | _ -> accum (digit / 10L) list @ [digit % 10L]
+        accum digit []
 
-    let digPow num pow =
-        let digitAsList = getDigitAsList num []
-        digitAsList |> List.
+    let digPow (num : int64) pow =
+        let digitAsList = getDigitAsList num
+        let rec listPowSum list pow sum =
+            match list with
+                | head :: tail -> listPowSum tail (pow + 1) (sum + int64((float(head) ** float (pow))))
+                | []           -> sum
+        let sum = listPowSum digitAsList pow 0L
+        if sum % num = 0L then sum / num else -1L
 
-
+    digPow 89L 1
+    
     /// Squares a value.
     let square x = x * x
 
